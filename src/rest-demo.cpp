@@ -18,20 +18,22 @@ typedef std::vector<double> position_t;
 struct Model : realm::object<Model>
 {
     // db internal
-    realm::persisted<int64_t> _id;
-
+    realm::persisted<realm::object_id> _id{realm::object_id::generate()};
+    realm::persisted<identifier_t> owner_id;   // Id of the site, for multitenancy
+ 
     // user defined
     realm::persisted<identifier_t> machine_id;   // Id of the current machine_id, e.g. 1.
-    realm::persisted<identifier_t> cycle_id;     // Id of the current production cycle, e.g. 1.
-    realm::persisted<timestamp_t> cycle_start;   // The starting time of the current production cycle. This information will be in epoch time format.
-    realm::persisted<timestamp_t> cycle_end;     // The ending time of the current production cycle. This information will be in epoch time format.
-    realm::persisted<load_t> pay_load;           // The transported load in kg for the current production cycle, e.g. 17000 .
-    realm::persisted<std::string> material_type; // The material of the load, e.g. sand.
+    realm::persisted<std::optional<identifier_t>> cycle_id;     // Id of the current production cycle, e.g. 1.
+    realm::persisted<std::optional<timestamp_t>> cycle_start;   // The starting time of the current production cycle. This information will be in epoch time format.
+    realm::persisted<std::optional<timestamp_t>> cycle_end;     // The ending time of the current production cycle. This information will be in epoch time format.
+    realm::persisted<std::optional<load_t>> pay_load;           // The transported load in kg for the current production cycle, e.g. 17000 .
+    realm::persisted<std::optional<std::string>> material_type; // The material of the load, e.g. sand.
     realm::persisted<position_t> dumping_spot;   // The longitude, latitude and altitude of the dumping spot.
 
     static constexpr auto schema = realm::schema(
-        "AllTypesObject",
+        "IoTObject",
         realm::property<&Model::_id, true>("_id"),
+        realm::property<&Model::owner_id>("owner_id"),
 
         realm::property<&Model::machine_id>("machine_id"),
         realm::property<&Model::cycle_id>("cycle_id"),
@@ -51,7 +53,6 @@ using namespace web::http::experimental::listener;
 void add_object(realm::db<Model> &synced_realm)
 {
     auto data = Model{
-        ._id = 1,
         .machine_id = 1};
     auto epoch = chrono::system_clock::now().time_since_epoch().count();
     data.cycle_start = timestamp_t(chrono::seconds(epoch));
@@ -64,7 +65,7 @@ void add_object(realm::db<Model> &synced_realm)
 Model model_from_json(json::object obj)
 {
     auto data = Model{
-        ._id = 1 // how to create new unique id?
+        .owner_id = 1 // needed for multitenancy, hardcoded for now
     };
 
     // this can maybe be done using the realm schema
