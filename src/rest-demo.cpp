@@ -111,7 +111,7 @@ int main(int argc, char const *argv[])
     auto tsr = realm::async_open<Model>(flx_sync_config).get_future().get();
     auto synced_realm = tsr.resolve();
 
-    http_listener listener(uri("http://*:9000/restdemo"));
+    http_listener listener(uri("http://0.0.0.0:9000/restdemo"));
 
     listener.support(methods::PUT, [&synced_realm](http_request request)
                      {
