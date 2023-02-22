@@ -72,15 +72,15 @@ Model model_from_json(json::object obj)
     // also skipping type error handling for now
     json::object::const_iterator it;
     if ((it = obj.find("machine_id")) != obj.end())
-        data.machine_id = it->second.as_number().is_int64();
+        data.machine_id = it->second.as_number().to_int64();
     if ((it = obj.find("cycle_id")) != obj.end())
-        data.cycle_id = it->second.as_number().is_int64();
+        data.cycle_id = it->second.as_number().to_int64();
     if ((it = obj.find("cycle_start")) != obj.end())
-        data.cycle_start = timestamp_t(chrono::seconds(it->second.as_number().is_int64()));
+        data.cycle_start = timestamp_t(std::chrono::seconds(it->second.as_number().to_int64()));
     if ((it = obj.find("cycle_end")) != obj.end())
-        data.cycle_end = timestamp_t(chrono::seconds(it->second.as_number().is_int64()));
+        data.cycle_end = timestamp_t(std::chrono::seconds(it->second.as_number().to_int64()));
     if ((it = obj.find("pay_load")) != obj.end())
-        data.pay_load = load_t(it->second.as_number().is_int64());
+        data.pay_load = load_t(it->second.as_number().to_int64());
     if ((it = obj.find("material_type")) != obj.end())
         data.material_type = it->second.as_string().c_str();
     if ((it = obj.find("dumping_spot")) != obj.end())
