@@ -171,7 +171,7 @@ int main(int argc, char const *argv[])
                                       }
                                   });
                                   while(!queue.empty())
-                                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                               }
                           }
                           catch (http_exception const & e)
@@ -193,7 +193,7 @@ int main(int argc, char const *argv[])
         {
             queue.invoke_all();
             while(queue.empty())
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
     catch (std::exception const &e)
